@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.DS_Store
+.web-shader-extractor/
+
+# 早期实验与本地分析产物，不属于当前 React/Vite 成品
+capture-baseline/
+editable-project/
+/editor.css
+/main.js
+/styles.css
+/refinements.css
+/extraction-report.md
+/known-gaps.md
+/qa-report.md
+/replay-manifest.json
+/scout-card.json

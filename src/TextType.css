@@ -1,0 +1,46 @@
+/**
+ * [INPUT]: 依赖 TextType.jsx 输出的内容层与光标层类名
+ * [OUTPUT]: 提供稳定标题占位、行内打字内容、绿色呼吸光标与编辑态轮廓
+ * [POS]: src 的 TextType 局部样式边界，继承第二屏标题字体排版，只负责打字行为的视觉反馈
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
+.text-type {
+  display:block;
+  min-height:.9em;
+  white-space:pre-wrap;
+}
+
+.text-type__content {
+  display:inline;
+  outline:1px dashed transparent;
+  outline-offset:5px;
+  cursor:text;
+}
+
+.text-type__content:hover,
+.text-type__content:focus {
+  outline-color:rgba(255,255,255,.5);
+}
+
+.text-type__content:focus {
+  background:rgba(255,255,255,.06);
+}
+
+.text-type__cursor {
+  display:inline-block;
+  margin-left:.08em;
+  color:#baff82;
+  font-size:.82em;
+  font-weight:400;
+  transform:translateY(-.03em);
+}
+
+.text-type__cursor--hidden {
+  visibility:hidden;
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .text-type__cursor {
+    opacity:1 !important;
+  }
+}

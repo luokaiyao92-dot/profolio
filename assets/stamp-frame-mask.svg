@@ -1,0 +1,42 @@
+<!--
+  [INPUT]: 依赖 LifePhotoCard 固定 3:4 卡片比例与图一的 6×8 粗齿孔节奏
+  [OUTPUT]: 提供带真实 Alpha 透明齿孔的 1200×1600 SVG 蒙版
+  [POS]: assets 的邮票边框裁切资产，由 src/styles.css 的 life-card-frame 消费，使叠放卡片透出下层内容
+  [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600" preserveAspectRatio="none">
+  <mask id="stamp-frame" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="1600">
+    <rect width="1200" height="1600" fill="white" />
+    <g fill="black">
+      <circle cx="140" cy="0" r="71" />
+      <circle cx="328" cy="0" r="71" />
+      <circle cx="516" cy="0" r="71" />
+      <circle cx="704" cy="0" r="71" />
+      <circle cx="892" cy="0" r="71" />
+      <circle cx="1080" cy="0" r="71" />
+      <circle cx="140" cy="1600" r="71" />
+      <circle cx="328" cy="1600" r="71" />
+      <circle cx="516" cy="1600" r="71" />
+      <circle cx="704" cy="1600" r="71" />
+      <circle cx="892" cy="1600" r="71" />
+      <circle cx="1080" cy="1600" r="71" />
+      <circle cx="0" cy="144" r="71" />
+      <circle cx="0" cy="332" r="71" />
+      <circle cx="0" cy="520" r="71" />
+      <circle cx="0" cy="708" r="71" />
+      <circle cx="0" cy="896" r="71" />
+      <circle cx="0" cy="1084" r="71" />
+      <circle cx="0" cy="1272" r="71" />
+      <circle cx="0" cy="1460" r="71" />
+      <circle cx="1200" cy="144" r="71" />
+      <circle cx="1200" cy="332" r="71" />
+      <circle cx="1200" cy="520" r="71" />
+      <circle cx="1200" cy="708" r="71" />
+      <circle cx="1200" cy="896" r="71" />
+      <circle cx="1200" cy="1084" r="71" />
+      <circle cx="1200" cy="1272" r="71" />
+      <circle cx="1200" cy="1460" r="71" />
+    </g>
+  </mask>
+  <rect width="1200" height="1600" fill="white" mask="url(#stamp-frame)" />
+</svg>

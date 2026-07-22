@@ -1,0 +1,21 @@
+/**
+ * [INPUT]: 依赖 BounceCards.jsx 输出的 bounce-cards-container 与 bounce-card-item 类名
+ * [OUTPUT]: 提供 GSAP 卡片动效的定位、指针反馈、合成层提示与减少动态偏好降级
+ * [POS]: src 的 BounceCards 专属样式边界，只承载动效行为，不覆盖 styles.css 中的邮票视觉与布局参数
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
+.bounce-cards-container {
+  position: relative;
+}
+
+.bounce-card-item {
+  cursor: pointer;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bounce-card-item {
+    will-change: auto;
+  }
+}

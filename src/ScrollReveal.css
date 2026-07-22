@@ -1,0 +1,31 @@
+/**
+ * [INPUT]: 依赖 ScrollReveal.jsx 输出的容器、文本与逐字图层类名
+ * [OUTPUT]: 提供不改变正文排版的逐字合成层、编辑态轮廓与减少动态偏好降级
+ * [POS]: src 的 ScrollReveal 局部样式边界，只声明动效组件行为，不接管第二屏字号与间距
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
+.scroll-reveal {
+  transform-origin:0% 50%;
+}
+
+.scroll-reveal-text {
+  margin:0;
+  color:inherit;
+  font:inherit;
+  letter-spacing:inherit;
+  white-space:pre-wrap;
+}
+
+.scroll-reveal-character {
+  display:inline-block;
+  will-change:opacity,filter;
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .scroll-reveal,
+  .scroll-reveal-character {
+    transform:none !important;
+    filter:none !important;
+    opacity:1 !important;
+  }
+}
