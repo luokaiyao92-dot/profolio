@@ -1,6 +1,6 @@
 # Kaiyao Portfolio
 
-罗凯尧的个人作品集基础版本，使用 React、Vite、GSAP 与原生 CSS 构建，面向 PC 端展示并保留可编辑文字与独立媒体占位图层。
+罗凯尧的个人作品集，使用 React、Vite、Three.js、GSAP 与原生 CSS 构建，包含 GPU 首屏转场、流体背景和覆盖式章节滚动。
 
 ## 本地运行
 
@@ -21,7 +21,9 @@ npm run build
 
 ## 当前交互
 
-- Hero 双背景聚光揭示与平滑鼠标追踪
+- 点阵双手入口点击后，以 GPU 液态融化动效揭示 Hero
+- 风筝草地 Hero 响应鼠标划过产生流体扭曲
+- Hero 固定在视口底层，后续章节向上滚动覆盖首屏
 - K / Y / * 字形悬停泡泡反馈
 - 第二屏标题变速打字与正文逐字滚动揭示
 - 六张生活照片卡片的错峰弹入与悬停推开
@@ -29,13 +31,13 @@ npm run build
 
 ## 后续替换素材
 
-- Hero 图片入口位于 `src/App.jsx` 的 `HERO_BASE_IMAGE` 与 `HERO_REVEAL_IMAGE`
-- 生活照片占位层位于 `LifePhotoCard` 组件的 `.life-card-photo`
+- 生活照片映射位于 `src/App.jsx` 的 `LIFE_CARD_MEDIA`；每张卡片分别提供 `defaultImage` 与 `hoverImage` 两个入口
 - 透明泡泡与邮票齿孔素材位于 `assets/`
 
 ## 技术栈
 
 - React 19.2.6
 - Vite 8.0.13
+- Three.js 0.185.1
 - GSAP 3.15.0
 - 原生 CSS

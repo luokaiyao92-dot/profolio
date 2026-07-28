@@ -1,18 +1,24 @@
 /**
- * [INPUT]: 依赖 React 的 useEffect/useRef/useState，依赖 BounceCards、ScrollReveal 与 TextType 的 GSAP 动效，依赖 hero-iridescent-bubble.png 的透明泡泡素材，依赖 styles.css 的分层画布与交互视觉系统
- * [OUTPUT]: 对外提供 App 单页作品集组件、双图层聚光 Hero、K/Y/* 分字形悬停泡泡语义、第二屏可编辑打字标题与逐字揭示正文、横铺版心的六张生活照片卡片
- * [POS]: src 的核心画布编排器，以交互式 Hero 建立视觉入口并组织介绍、项目拼贴与尾部作品结构
+ * [INPUT]: 依赖 React 的 useEffect/useRef/useState，依赖 HeroIntro 的封面状态边界、LiquidHover 的 WebGL 背景扰动，依赖 BounceCards、ScrollReveal 与 TextType 的 GSAP 动效，以及风筝草地 Hero、泡泡和五张生活图片素材
+ * [OUTPUT]: 对外提供 App 单页作品集组件、Fluid Reveal 入口、可随指针流动的风筝草地 Hero、K/Y/* 分字形悬停泡泡语义，以及介绍、项目拼贴与精选作品区
+ * [POS]: src 的核心画布编排器，以“封面解锁→四段式作品集”状态流组织品牌入口、个人介绍、不对称项目网格与尾部精选作品
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 import { useEffect, useRef, useState } from 'react';
 import BounceCards from './BounceCards.jsx';
+import HeroIntro from './HeroIntro.jsx';
+import LiquidHover from './LiquidHover.jsx';
 import ScrollReveal from './ScrollReveal.jsx';
 import TextType from './TextType.jsx';
+import './HeroIntro.css';
 import heroBubbleImage from '../assets/hero-iridescent-bubble.png';
+import heroSkyKite from '../assets/hero-sky-kite.png';
+import lifeCardDefault01 from '../assets/life-card-default-01.jpg';
+import lifeCardDefault02 from '../assets/life-card-default-02.jpg';
+import lifeCardDefault03 from '../assets/life-card-default-03.jpg';
+import lifeCardDefault04 from '../assets/life-card-default-04.jpg';
+import lifeCardDefault05 from '../assets/life-card-default-05.jpg';
 
-const HERO_BASE_IMAGE = 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_195923_b0ba8ace-1d1d-4f2c-9a28-1ab84b330680.png&w=1280&q=85';
-const HERO_REVEAL_IMAGE = 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_201152_bba90a12-bf12-459f-91f0-51f237dbaf3b.png&w=1280&q=85';
-const SPOTLIGHT_RADIUS = 260;
 const LIFE_CARD_TRANSFORMS = [
   'translateY(-3px) rotate(-0.4deg)',
   'translateY(-7px) rotate(1.4deg)',
@@ -20,6 +26,15 @@ const LIFE_CARD_TRANSFORMS = [
   'translateY(1px) rotate(-1.8deg)',
   'translateY(-4px) rotate(1.2deg)',
   'translateY(5px) rotate(1.7deg)',
+];
+
+const LIFE_CARD_MEDIA = [
+  { defaultImage: lifeCardDefault01, hoverImage: null, alt: '蓝色天空中的飞机与建筑剪影' },
+  { defaultImage: lifeCardDefault02, hoverImage: null, alt: '橙红色山丘与天空' },
+  { defaultImage: lifeCardDefault03, hoverImage: null, alt: '紫色调生活记录与雕塑' },
+  { defaultImage: lifeCardDefault04, hoverImage: null, alt: '绿色调城市建筑' },
+  { defaultImage: lifeCardDefault05, hoverImage: null, alt: '暖橙色天空中的飞机与建筑剪影' },
+  { defaultImage: lifeCardDefault01, hoverImage: null, alt: '蓝色天空中的飞机与建筑剪影' },
 ];
 
 const editables = {
@@ -59,20 +74,20 @@ function EditableText({ name, as: Tag = 'p', className = '', children, onMouseEn
   );
 }
 
-function MediaPlaceholder({ name, className = '', tone = 'gray', label }) {
+function PortfolioMedia({ name, className = '', src, alt }) {
   return (
-    <div className={`media-layer media-${tone} ${className}`} data-layer={`Media / ${name}`} role="img" aria-label={label}>
-      <span>{label}</span>
-    </div>
+    <figure className={`portfolio-media ${className}`} data-layer={`Media / ${name}`}>
+      <img src={src} alt={alt} decoding="async" />
+    </figure>
   );
 }
 
-function LifePhotoCard({ index, className = '', style, onMouseEnter, onMouseLeave }) {
+function LifePhotoCard({ index, defaultImage, hoverImage, alt, className = '', style, onMouseEnter, onMouseLeave }) {
   const layerId = String(index).padStart(2, '0');
 
   return (
     <article
-      className={`life-card ${className}`.trim()}
+      className={`life-card ${hoverImage ? 'has-hover-image' : ''} ${className}`.trim()}
       data-layer={`Card / Life Photo ${layerId}`}
       style={style}
       onMouseEnter={onMouseEnter}
@@ -81,16 +96,30 @@ function LifePhotoCard({ index, className = '', style, onMouseEnter, onMouseLeav
       <div className="life-card-frame" data-layer={`Frame / Life Photo ${layerId}`} aria-hidden="true" />
       <div
         className="life-card-photo"
-        data-layer={`Photo Placeholder / Life Photo ${layerId}`}
+        data-layer={`Photo Clip / Life Photo ${layerId}`}
         role="img"
-        aria-label={`生活照片 ${layerId} 占位图层`}
-      />
+        aria-label={alt}
+      >
+        <div
+          className={`life-card-photo-layer life-card-photo-default ${defaultImage ? 'has-image' : 'is-placeholder'}`}
+          data-layer={`Photo Default / Life Photo ${layerId}`}
+        >
+          {defaultImage && <img src={defaultImage} alt="" loading="lazy" decoding="async" />}
+        </div>
+        <div
+          className={`life-card-photo-layer life-card-photo-hover ${hoverImage ? 'has-image' : 'is-placeholder'}`}
+          data-layer={`Photo Hover Original / Life Photo ${layerId}`}
+          aria-hidden="true"
+        >
+          {hoverImage && <img src={hoverImage} alt="" loading="lazy" decoding="async" />}
+        </div>
+      </div>
     </article>
   );
 }
 
-function NavItem({ children, name }) {
-  return <button className="nav-item" data-layer={`Button / Nav / ${name}`}>{children}</button>;
+function NavItem({ children, name, href }) {
+  return <a className="nav-item" data-layer={`Button / Nav / ${name}`} href={href}>{children}</a>;
 }
 
 function HeroSignature() {
@@ -155,133 +184,51 @@ function HeroSignature() {
   );
 }
 
-function RevealLayer({ image, cursorX, cursorY }) {
-  const canvasRef = useRef(null);
-  const revealRef = useRef(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return undefined;
-
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    return () => window.removeEventListener('resize', resizeCanvas);
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const reveal = revealRef.current;
-    const context = canvas?.getContext('2d');
-    if (!canvas || !reveal || !context) return;
-
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    const gradient = context.createRadialGradient(cursorX, cursorY, 0, cursorX, cursorY, SPOTLIGHT_RADIUS);
-    gradient.addColorStop(0, 'rgba(255,255,255,1)');
-    gradient.addColorStop(0.4, 'rgba(255,255,255,1)');
-    gradient.addColorStop(0.6, 'rgba(255,255,255,.75)');
-    gradient.addColorStop(0.75, 'rgba(255,255,255,.4)');
-    gradient.addColorStop(0.88, 'rgba(255,255,255,.12)');
-    gradient.addColorStop(1, 'rgba(255,255,255,0)');
-    context.fillStyle = gradient;
-    context.beginPath();
-    context.arc(cursorX, cursorY, SPOTLIGHT_RADIUS, 0, Math.PI * 2);
-    context.fill();
-
-    const mask = `url(${canvas.toDataURL()})`;
-    reveal.style.maskImage = mask;
-    reveal.style.webkitMaskImage = mask;
-  }, [cursorX, cursorY]);
-
-  return (
-    <div className="hero-reveal-layer" data-layer="Media / Hero Reveal">
-      <canvas ref={canvasRef} className="hero-mask-canvas" aria-hidden="true" />
-      <div
-        ref={revealRef}
-        className="hero-reveal-image"
-        style={{ backgroundImage: `url(${image})` }}
-        aria-hidden="true"
-      />
-    </div>
-  );
-}
-
-function InteractiveHero() {
-  const mouse = useRef({ x: -999, y: -999 });
-  const smooth = useRef({ x: -999, y: -999 });
-  const rafRef = useRef(null);
-  const [cursorPos, setCursorPos] = useState({ x: -999, y: -999 });
-
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
-
-    const handleMouseMove = (event) => {
-      mouse.current = { x: event.clientX, y: event.clientY };
-      if (smooth.current.x < -900) smooth.current = { ...mouse.current };
-    };
-
-    const animate = () => {
-      smooth.current.x += (mouse.current.x - smooth.current.x) * 0.1;
-      smooth.current.y += (mouse.current.y - smooth.current.y) * 0.1;
-      setCursorPos({ ...smooth.current });
-      rafRef.current = requestAnimationFrame(animate);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    rafRef.current = requestAnimationFrame(animate);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(rafRef.current);
-    };
-  }, []);
-
+function InteractiveHero({ liquidEnabled }) {
   return (
     <section className="hero-section" data-layer="Section / Interactive Hero">
       <div
-        className="hero-base-image hero-zoom"
-        data-layer="Media / Hero Base"
-        style={{ backgroundImage: `url(${HERO_BASE_IMAGE})` }}
+        className="hero-background"
         role="img"
-        aria-label="深色岩层与自然地貌背景"
-      />
-      <RevealLayer image={HERO_REVEAL_IMAGE} cursorX={cursorPos.x} cursorY={cursorPos.y} />
-      <div className="hero-overlay" data-layer="Decoration / Hero Gradient" />
-
+        aria-label="蓝天白云、花田、蝴蝶与彩色风筝"
+        data-layer="Media / Liquid Hero Background"
+      >
+        <img className="hero-background-fallback" src={heroSkyKite} alt="" />
+        {liquidEnabled && (
+          <LiquidHover imageSrc={heroSkyKite} resolution={10} cursorSize={50} intensity={50} />
+        )}
+      </div>
       <div className="hero-content page-shell">
         <header className="hero-header" data-layer="Navigation / Primary">
           <EditableText name="hero-brand" as="h2" className="hero-brand">{editables.brand}</EditableText>
           <EditableText name="hero-motto" className="hero-motto">{editables.motto}</EditableText>
           <div className="hero-nav">
-            <NavItem name="Work">WORK</NavItem>
-            <NavItem name="Contact">CONTACT</NavItem>
-            <NavItem name="Resume">REASUM</NavItem>
-            <NavItem name="Music">音乐关掉</NavItem>
-            <NavItem name="Language">EN</NavItem>
+            <NavItem name="Work" href="#work">WORK</NavItem>
+            <NavItem name="Contact" href="#contact">CONTACT</NavItem>
+            <NavItem name="Resume" href="#about">RESUME</NavItem>
+            <NavItem name="Music" href="#about">音乐关闭</NavItem>
+            <NavItem name="Language" href="#about">EN</NavItem>
           </div>
         </header>
 
         <EditableText name="hero-bio" className="hero-bio hero-anim hero-fade">{editables.bio}</EditableText>
         <HeroSignature />
         <EditableText name="hero-idea" className="hero-idea hero-anim hero-fade">{editables.idea}</EditableText>
-        <div className="spotlight-hint hero-anim hero-fade" data-layer="Hint / Spotlight" aria-hidden="true">
-          <span className="spotlight-dot" />
-          MOVE TO REVEAL
-        </div>
       </div>
     </section>
   );
 }
 
 function App() {
-  return (
-    <main className="portfolio-canvas" data-layer="Page / Kaiyao Portfolio">
-      <InteractiveHero />
+  const [isIntroVisible, setIsIntroVisible] = useState(true);
 
-      <section className="about-section page-shell" data-layer="Section / About">
+  return (
+    <>
+      {isIntroVisible && <HeroIntro onComplete={() => setIsIntroVisible(false)} />}
+      <main className="portfolio-canvas" data-layer="Page / Kaiyao Portfolio" aria-hidden={isIntroVisible || undefined}>
+      <InteractiveHero liquidEnabled={!isIntroVisible} />
+
+      <section id="about" className="about-section page-shell" data-layer="Section / About">
         <div className="about-copy-column" data-layer="Group / About Copy">
           <TextType
             text={editables.introTitle}
@@ -311,7 +258,7 @@ function App() {
             {editables.introCopy}
           </ScrollReveal>
         </div>
-        <MediaPlaceholder name="Particle Fish Artwork" className="fish-art" tone="particles" label="Particle artwork placeholder" />
+        <PortfolioMedia name="Portrait Artwork" className="portrait-art" src={lifeCardDefault03} alt="紫色调人物与雕塑艺术作品" />
         <BounceCards
           className="life-card-strip"
           animationDelay={0.12}
@@ -321,33 +268,36 @@ function App() {
           hoverPush={56}
           enableHover
         >
-          {Array.from({ length: 6 }, (_, index) => <LifePhotoCard key={index} index={index + 1} />)}
+          {LIFE_CARD_MEDIA.map((media, index) => (
+            <LifePhotoCard key={index} index={index + 1} {...media} />
+          ))}
         </BounceCards>
       </section>
 
-      <section className="project-section page-shell" data-layer="Section / Project Layout">
+      <section id="work" className="project-section page-shell" data-layer="Section / Project Layout">
         <EditableText name="project-section-note" className="section-note">{editables.idea}</EditableText>
         <div className="project-layout" data-layer="Auto Layout / Project Mosaic">
           <div className="project-left-stack" data-layer="Auto Layout / Project Left Stack">
-            <MediaPlaceholder name="Project Card Large" className="project-image project-large angled" tone="gray" label="Project image placeholder" />
-            <MediaPlaceholder name="Project Card Small" className="project-image project-small" tone="gray" label="Project image placeholder" />
+            <PortfolioMedia name="Project Card Large" className="project-image project-large angled" src={lifeCardDefault01} alt="蓝色天空与飞机项目视觉" />
+            <PortfolioMedia name="Project Card Small" className="project-image project-small" src={lifeCardDefault02} alt="橙红山丘项目视觉" />
           </div>
           <div className="project-copy" data-layer="Group / Project Copy">
             <EditableText name="project-title" as="h2">{editables.projectTitle}</EditableText>
             <EditableText name="project-copy" className="project-description">{editables.projectCopy}</EditableText>
           </div>
           <div className="project-right-stack" data-layer="Auto Layout / Project Right Stack">
-            <MediaPlaceholder name="Project Card Top" className="project-image" tone="gray" label="Project image placeholder" />
-            <MediaPlaceholder name="Project Card Bottom" className="project-image" tone="gray" label="Project image placeholder" />
+            <PortfolioMedia name="Project Card Top" className="project-image" src={lifeCardDefault04} alt="绿色城市建筑项目视觉" />
+            <PortfolioMedia name="Project Card Bottom" className="project-image" src={lifeCardDefault05} alt="暖橙天空项目视觉" />
           </div>
         </div>
       </section>
 
-      <section className="featured-section page-shell" data-layer="Section / Featured Artwork">
+      <section id="contact" className="featured-section page-shell" data-layer="Section / Featured Artwork">
         <EditableText name="featured-note" className="section-note">{editables.idea}</EditableText>
-        <MediaPlaceholder name="Featured Sticker Artwork" className="featured-art" tone="sticker" label="Featured artwork placeholder" />
+        <PortfolioMedia name="Featured Artwork" className="featured-art" src={lifeCardDefault03} alt="紫色调精选人物艺术作品" />
       </section>
-    </main>
+      </main>
+    </>
   );
 }
 

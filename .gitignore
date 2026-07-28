@@ -3,6 +3,11 @@ dist/
 .DS_Store
 .web-shader-extractor/
 
+# 本地视觉验收产物，不进入生产仓库
+/*.png
+/design-qa.md
+/assets/hero-reveal-target.png
+
 # 早期实验与本地分析产物，不属于当前 React/Vite 成品
 capture-baseline/
 editable-project/
