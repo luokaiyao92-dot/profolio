@@ -1,6 +1,6 @@
 /**
- * [INPUT]: 依赖 React 的 useEffect/useRef/useState，依赖 HeroIntro 的封面状态边界、LiquidHover 的 WebGL 背景扰动，依赖 BounceCards、ScrollReveal 与 TextType 的 GSAP 动效，以及风筝草地 Hero、泡泡和五张生活图片素材
- * [OUTPUT]: 对外提供 App 单页作品集组件、Fluid Reveal 入口、可随指针流动的风筝草地 Hero、K/Y/* 分字形悬停泡泡语义，以及介绍、项目拼贴与精选作品区
+ * [INPUT]: 依赖 React 的 useEffect/useRef/useState，依赖 HeroIntro 的封面状态边界、LiquidHover 的 WebGL 背景扰动，依赖 BounceCards、ScrollReveal 与 TextType 的 GSAP 动效，以及风筝草地 Hero、五套字形悬停素材、四张固定 Hero 卡片图和生活图片素材
+ * [OUTPUT]: 对外提供 App 单页作品集组件、Fluid Reveal 入口、可随指针流动的风筝草地 Hero、K/Y/a/T/M 带语义文字的独立图形反馈、四张无需上传操作且刷新后稳定保留图片的倾斜 Hero 卡片以及无悬停反馈的 * 字形，并组织介绍、项目拼贴与精选作品区
  * [POS]: src 的核心画布编排器，以“封面解锁→四段式作品集”状态流组织品牌入口、个人介绍、不对称项目网格与尾部精选作品
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -11,8 +11,15 @@ import LiquidHover from './LiquidHover.jsx';
 import ScrollReveal from './ScrollReveal.jsx';
 import TextType from './TextType.jsx';
 import './HeroIntro.css';
-import heroBubbleImage from '../assets/hero-iridescent-bubble.png';
+import heroCreateFlower from '../assets/hero-create-flower.png';
+import heroHoverArrow from '../assets/hero-hover-arrow.png';
+import heroHoverGreen from '../assets/hero-hover-green.png';
+import heroHoverOrange from '../assets/hero-hover-orange.png';
 import heroSkyKite from '../assets/hero-sky-kite.png';
+import heroCardFishingCharacter from '../assets/hero-card-fishing-character.png';
+import heroCardLightbulbCharacter from '../assets/hero-card-lightbulb-character.png';
+import heroCardPineappleCharacter from '../assets/hero-card-pineapple-character.jpg';
+import heroCardPinkCharacter from '../assets/hero-card-pink-character.png';
 import lifeCardDefault01 from '../assets/life-card-default-01.jpg';
 import lifeCardDefault02 from '../assets/life-card-default-02.jpg';
 import lifeCardDefault03 from '../assets/life-card-default-03.jpg';
@@ -35,6 +42,21 @@ const LIFE_CARD_MEDIA = [
   { defaultImage: lifeCardDefault04, hoverImage: null, alt: '绿色调城市建筑' },
   { defaultImage: lifeCardDefault05, hoverImage: null, alt: '暖橙色天空中的飞机与建筑剪影' },
   { defaultImage: lifeCardDefault01, hoverImage: null, alt: '蓝色天空中的飞机与建筑剪影' },
+];
+
+const HERO_HOVER_MEDIA = {
+  k: { src: heroCreateFlower, label: null },
+  y: { src: heroHoverArrow, label: 'Thinking' },
+  a: { src: heroHoverOrange, label: 'Taste' },
+  t: { src: heroHoverGreen, label: 'A bit of fun' },
+  m: { src: heroHoverGreen, label: 'A bit of fun' },
+};
+
+const HERO_CARD_MEDIA = [
+  { src: heroCardFishingCharacter, alt: '在湖边钓鱼的白色卡通角色' },
+  { src: heroCardLightbulbCharacter, alt: '砖墙工作室中的灯泡角色' },
+  { src: heroCardPineappleCharacter, alt: '火焰与鱼群环绕的菠萝角色' },
+  { src: heroCardPinkCharacter, alt: '站在旧集装箱前的粉色卡通角色' },
 ];
 
 const editables = {
@@ -124,23 +146,23 @@ function NavItem({ children, name, href }) {
 
 function HeroSignature() {
   const signatureRef = useRef(null);
-  const [hoverBubble, setHoverBubble] = useState(null);
+  const [hoverArt, setHoverArt] = useState(null);
+  const hoverItem = hoverArt ? HERO_HOVER_MEDIA[hoverArt.key] : null;
 
-  const revealBubble = (key, label, event) => {
+  const revealArt = (key, event) => {
     const signatureBounds = signatureRef.current?.getBoundingClientRect();
     const glyphBounds = event.currentTarget.getBoundingClientRect();
     if (!signatureBounds) return;
 
-    setHoverBubble({
+    setHoverArt({
       key,
-      label,
       x: glyphBounds.left - signatureBounds.left + glyphBounds.width / 2,
       y: glyphBounds.top - signatureBounds.top + glyphBounds.height / 2,
     });
   };
 
-  const hideBubble = (key) => {
-    setHoverBubble((current) => current?.key === key ? null : current);
+  const hideArt = (key) => {
+    setHoverArt((current) => current?.key === key ? null : current);
   };
 
   return (
@@ -150,36 +172,68 @@ function HeroSignature() {
           name="hero-glyph-k"
           as="span"
           className="hero-glyph hero-glyph-k"
-          onMouseEnter={(event) => revealBubble('k', 'Create', event)}
-          onMouseLeave={() => hideBubble('k')}
+          onMouseEnter={(event) => revealArt('k', event)}
+          onMouseLeave={() => hideArt('k')}
         >K</EditableText>
         <EditableText
           name="hero-glyph-y"
           as="span"
           className="hero-glyph hero-glyph-y"
-          onMouseEnter={(event) => revealBubble('y', 'Taste', event)}
-          onMouseLeave={() => hideBubble('y')}
+          onMouseEnter={(event) => revealArt('y', event)}
+          onMouseLeave={() => hideArt('y')}
         >Y</EditableText>
-        <EditableText name="hero-glyph-a" as="span" className="hero-glyph-a">a</EditableText>
+        <EditableText
+          name="hero-glyph-a"
+          as="span"
+          className="hero-glyph hero-glyph-a"
+          onMouseEnter={(event) => revealArt('a', event)}
+          onMouseLeave={() => hideArt('a')}
+        >a</EditableText>
       </h1>
-      <EditableText
-        name="hero-asterisk"
-        as="span"
-        className="hero-asterisk hero-glyph hero-anim hero-reveal"
-        onMouseEnter={(event) => revealBubble('asterisk', 'Timing', event)}
-        onMouseLeave={() => hideBubble('asterisk')}
-      >*</EditableText>
-      <EditableText name="hero-trademark" as="sup" className="hero-anim hero-reveal">TM</EditableText>
+      <EditableText name="hero-asterisk" as="span" className="hero-asterisk hero-anim hero-reveal">*</EditableText>
+      <sup className="hero-trademark hero-anim hero-reveal" data-layer="Text Group / Trademark">
+        <EditableText
+          name="hero-glyph-t"
+          as="span"
+          className="hero-glyph hero-glyph-t"
+          onMouseEnter={(event) => revealArt('t', event)}
+          onMouseLeave={() => hideArt('t')}
+        >T</EditableText>
+        <EditableText
+          name="hero-glyph-m"
+          as="span"
+          className="hero-glyph hero-glyph-m"
+          onMouseEnter={(event) => revealArt('m', event)}
+          onMouseLeave={() => hideArt('m')}
+        >M</EditableText>
+      </sup>
 
       <div
-        className={`hero-hover-bubble ${hoverBubble ? 'is-visible' : ''}`}
-        style={{ '--bubble-x': `${hoverBubble?.x || 0}px`, '--bubble-y': `${hoverBubble?.y || 0}px` }}
-        data-layer="Interaction / Hero Glyph Bubble"
-        aria-hidden={!hoverBubble}
+        className={`hero-hover-art ${hoverItem ? 'is-asset' : ''} ${hoverArt ? 'is-visible' : ''}`}
+        style={{ '--hover-x': `${hoverArt?.x || 0}px`, '--hover-y': `${hoverArt?.y || 0}px` }}
+        data-layer="Interaction / Hero Glyph Art"
+        data-hover-key={hoverArt?.key || ''}
+        aria-hidden={!hoverArt}
       >
-        <img src={heroBubbleImage} alt="" />
-        <span>{hoverBubble?.label}</span>
+        {hoverItem && <img src={hoverItem.src} alt="" />}
+        {hoverItem?.label && <span>{hoverItem.label}</span>}
       </div>
+    </div>
+  );
+}
+
+function HeroCardDeck() {
+  return (
+    <div className="hero-card-deck" data-layer="Card Group / Hero Artwork Deck">
+      {HERO_CARD_MEDIA.map((card, index) => (
+        <article className={`hero-upload-card hero-upload-card-${index + 1}`} key={index}>
+          {index === 0 && <span className="hero-card-sticker hero-card-sticker-left">UX Designer</span>}
+          {index === 3 && <span className="hero-card-sticker hero-card-sticker-right">Don't let people think</span>}
+          <div className="hero-upload-preview has-image">
+            <img src={card.src} alt={card.alt} />
+          </div>
+        </article>
+      ))}
     </div>
   );
 }
@@ -213,6 +267,7 @@ function InteractiveHero({ liquidEnabled }) {
 
         <EditableText name="hero-bio" className="hero-bio hero-anim hero-fade">{editables.bio}</EditableText>
         <HeroSignature />
+        <HeroCardDeck />
         <EditableText name="hero-idea" className="hero-idea hero-anim hero-fade">{editables.idea}</EditableText>
       </div>
     </section>
