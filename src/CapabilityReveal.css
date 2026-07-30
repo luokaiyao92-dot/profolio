@@ -1,0 +1,124 @@
+/**
+ * [INPUT]: 依赖 CapabilityReveal.jsx 输出的 capability-sequence、capability-group 与既有 life-card-strip 类名
+ * [OUTPUT]: 提供第二屏能力信息的三列排版、邮票覆盖层级、滚动撕离合成提示与移动端/减少动态降级
+ * [POS]: src 的第二屏卡片撕离局部视觉边界，不重复定义邮票卡片皮肤，也不接管 GSAP 进度映射
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
+.capability-sequence {
+  position:absolute;
+  inset:0;
+  z-index:2;
+  overflow:hidden;
+}
+
+.capability-reveal {
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:clamp(150px,18vw,320px);
+  z-index:1;
+  display:grid;
+  grid-template-columns:.78fr 1.15fr 1.15fr;
+  gap:clamp(24px,4.5vw,78px);
+  align-items:start;
+}
+
+.capability-group {
+  min-width:0;
+  color:#fff;
+  will-change:transform,opacity;
+}
+
+.capability-kicker {
+  margin:0 0 14px;
+  color:rgba(255,255,255,.42);
+  font:400 13px/1.2 'Alibaba PuHuiTi','Noto Sans SC',sans-serif;
+  letter-spacing:.08em;
+}
+
+.capability-group h3 {
+  margin:0;
+  font:400 clamp(24px,2.2vw,38px)/1.24 'Alibaba PuHuiTi','Noto Sans SC',sans-serif;
+  letter-spacing:-.045em;
+}
+
+.capability-group-method p:last-child {
+  max-width:520px;
+  margin:18px 0 0;
+  color:rgba(255,255,255,.62);
+  font:400 clamp(15px,1.15vw,20px)/1.55 'Alibaba PuHuiTi','Noto Sans SC',sans-serif;
+}
+
+.capability-sequence .life-card-strip {
+  z-index:3;
+}
+
+.tear-card-shell {
+  position:relative;
+  flex:0 0 var(--card-width);
+  aspect-ratio:3/4;
+  isolation:isolate;
+}
+
+.tear-card-shell + .tear-card-shell {
+  margin-left:-2.22%;
+}
+
+.tear-card-shell:nth-child(1) { z-index:1; }
+.tear-card-shell:nth-child(2) { z-index:2; }
+.tear-card-shell:nth-child(3) { z-index:3; }
+.tear-card-shell:nth-child(4) { z-index:4; }
+.tear-card-shell:nth-child(5) { z-index:5; }
+.tear-card-shell:nth-child(6) { z-index:6; }
+
+.tear-card-visual,
+.tear-card-visual .life-card {
+  width:100%;
+  height:100%;
+}
+
+.tear-card-visual {
+  will-change:transform,opacity;
+}
+
+@media (max-width:900px) {
+  .capability-reveal {
+    bottom:250px;
+    grid-template-columns:1fr 1fr;
+  }
+
+  .tear-card-shell + .tear-card-shell {
+    margin-left:-20px;
+  }
+
+  .capability-group-method {
+    grid-column:1 / -1;
+  }
+}
+
+@media (max-width:560px) {
+  .capability-reveal {
+    bottom:220px;
+    grid-template-columns:1fr;
+    gap:26px;
+  }
+
+  .capability-group-method {
+    grid-column:auto;
+  }
+
+  .capability-group h3 {
+    font-size:22px;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .capability-sequence {
+    pointer-events:auto !important;
+  }
+
+  .capability-group {
+    opacity:1 !important;
+    transform:none !important;
+  }
+}

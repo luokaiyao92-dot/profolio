@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 依赖 App.jsx 的四段式语义结构、HeroMotion 的统一入场与退出时间线、LiquidHover 的 WebGL 风筝草地背景、K/Y/a/T/M 五套透明悬停图形、Hero 固定图片卡片组、阿里巴巴普惠体本地字库、真实项目媒体与生活卡片双图片图层
- * [OUTPUT]: 提供独立黑色页面底板、带稳定外间距和圆角裁切的 Hero 舞台、可在转场中等高收窄至屏宽 60% 的固定导航、横贯页面安全宽度且使用 24px/2 倍行距阿里巴巴普惠体的品牌主张正文、两屏运动预备态、响应式布局和减少动态模式最终态
+ * [OUTPUT]: 提供独立黑色页面底板、带稳定外间距和圆角裁切的 Hero 舞台、可在转场中等高收窄至屏宽 60% 的固定导航、无装饰肖像且横贯页面安全宽度的 24px/2 倍行距品牌主张正文、两屏运动预备态、响应式布局和减少动态模式最终态
  * [POS]: src 的唯一视觉系统，只定义黑色底板、封装舞台的最终版式和运动初始视觉状态；统一滚动进度与时间编排由 HeroMotion 独立管理
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -74,21 +74,14 @@ button,a { font:inherit; }
 .hero-bio { transform:translateY(16px); }
 .hero-idea { transform:translateY(10px); }
 
-.about-section { position:relative; z-index:2; min-height:max(100vh, clamp(520px,54vw,920px)); min-height:max(100svh, clamp(520px,54vw,920px)); overflow:visible; background:transparent; }
+.about-section { position:relative; z-index:2; min-height:390vh; min-height:390svh; overflow:visible; background:transparent; }
 .statement-background { position:absolute; inset:0; z-index:0; opacity:0; background:#000; pointer-events:none; will-change:opacity; }
-.about-transition-layer { position:relative; z-index:1; min-height:inherit; padding:clamp(72px,6.4vw,108px) 0 82px; display:grid; grid-template-columns:minmax(0,.98fr) minmax(0,.82fr); gap:clamp(60px,6vw,110px); align-items:start; opacity:0; transform:translateY(96px); will-change:transform,opacity; }
+.about-transition-layer { position:sticky; top:0; z-index:1; width:100%; height:100vh; height:100svh; min-height:700px; padding:clamp(72px,6.4vw,108px) 0 82px; display:grid; grid-template-columns:minmax(0,.98fr) minmax(0,.82fr); gap:clamp(60px,6vw,110px); align-items:start; overflow:hidden; opacity:0; transform:translateY(96px); will-change:transform,opacity; }
 .about-copy-column { display:flex; flex-direction:column; align-items:flex-start; padding-top:clamp(118px,9vw,156px); overflow:visible; }
 .about-copy-column h2 { margin:0 0 28px; font-family:'Konstant Grotesk','Arial Narrow','DM Sans',sans-serif; font-size:clamp(40px,4.1vw,74px); line-height:.9; letter-spacing:1px; font-weight:400; }
 .about-lead { position:relative; z-index:2; width:calc(100vw - 104px); max-width:none; margin:0 0 56px; color:rgba(255,255,255,.9); font-family:'Alibaba PuHuiTi','Noto Sans SC',sans-serif; font-size:24px; font-weight:400; line-height:2; letter-spacing:-.035em; }
 .life-card-strip { --card-width:18.52%; position:absolute; left:0; right:0; bottom:clamp(16px,2vw,34px); z-index:3; width:100%; display:flex; align-items:center; padding:28px 10px 38px; overflow:visible; isolation:isolate; }
 .life-card { position:relative; flex:0 0 var(--card-width); aspect-ratio:3/4; isolation:isolate; transform-origin:center; box-shadow:0 14px 60px rgba(32,33,36,.08); }
-.life-card+.life-card { margin-left:-2.22%; }
-.life-card:nth-child(1) { z-index:1; }
-.life-card:nth-child(2) { z-index:2; }
-.life-card:nth-child(3) { z-index:3; }
-.life-card:nth-child(4) { z-index:4; }
-.life-card:nth-child(5) { z-index:5; }
-.life-card:nth-child(6) { z-index:6; }
 .life-card-frame { position:absolute; inset:0; z-index:1; background:#faf7f2; -webkit-mask:url('../assets/stamp-frame-mask.svg') center/100% 100% no-repeat; mask:url('../assets/stamp-frame-mask.svg') center/100% 100% no-repeat; pointer-events:none; }
 .life-card-photo { position:absolute; inset:9.5% 11%; z-index:2; overflow:hidden; background:#a0a0a0; }
 .life-card-photo-layer { position:absolute; inset:0; background:#a0a0a0; transition:opacity .38s cubic-bezier(.16,1,.3,1); }
@@ -97,8 +90,6 @@ button,a { font:inherit; }
 .life-card-photo-hover { z-index:2; opacity:0; }
 .life-card.has-hover-image:hover .life-card-photo-default { opacity:0; }
 .life-card.has-hover-image:hover .life-card-photo-hover { opacity:1; }
-.portrait-art { width:100%; aspect-ratio:1/1; margin-top:78px; border-radius:48% 48% 42% 46%; opacity:.58; filter:saturate(.62) brightness(.58); }
-.portrait-art img { object-position:56% 48%; }
 
 .project-section { position:relative; z-index:3; min-height:clamp(590px,58vw,1040px); padding:clamp(46px,5.4vw,96px) 0; background:#000; }
 .project-section>.section-note,.featured-section>.section-note { margin-bottom:clamp(54px,7vw,120px); }
@@ -118,8 +109,8 @@ button,a { font:inherit; }
 .featured-art { width:min(67%,980px); margin:0 auto; aspect-ratio:1.48/1; border-radius:20px; }
 .featured-art img { object-position:center 38%; }
 
-@media (max-width:900px) { :root { --page:calc(100% - 40px); } .transition-scene { --hero-frame-gap:12px; } .hero-section { min-height:700px; } .hero-header { top:24px; } .hero-nav { max-width:100%; overflow-x:auto; } .nav-item { padding:7px 9px; font-size:8px; } .hero-bio { top:26%; left:0; width:82%; } .hero-signature { top:46%; } .hero-card-deck { top:60%; width:min(885px,94vw); } .hero-upload-card { flex-basis:clamp(141px,22.5vw,198px); } .hero-upload-card+.hero-upload-card { margin-left:clamp(-54px,-6vw,-34px); } .hero-card-sticker-right { bottom:20px; left:70%; } .about-transition-layer { grid-template-columns:1fr; gap:54px; padding-bottom:230px; } .about-copy-column { padding-top:72px; } .about-lead { width:calc(100vw - 40px); } .life-card-strip { --card-width:clamp(72px,20vw,105px); } .life-card+.life-card { margin-left:-20px; } .portrait-art { width:68%; margin-top:0; justify-self:end; } .project-layout { grid-template-columns:1fr 1fr; } .project-copy { grid-column:1 / -1; grid-row:1; transform:none; justify-self:center; margin-bottom:35px; } .project-left-stack { grid-column:1; } .project-right-stack { grid-column:2; } .featured-art { width:88%; } }
+@media (max-width:900px) { :root { --page:calc(100% - 40px); } .transition-scene { --hero-frame-gap:12px; } .hero-section { min-height:700px; } .hero-header { top:24px; } .hero-nav { max-width:100%; overflow-x:auto; } .nav-item { padding:7px 9px; font-size:8px; } .hero-bio { top:26%; left:0; width:82%; } .hero-signature { top:46%; } .hero-card-deck { top:60%; width:min(885px,94vw); } .hero-upload-card { flex-basis:clamp(141px,22.5vw,198px); } .hero-upload-card+.hero-upload-card { margin-left:clamp(-54px,-6vw,-34px); } .hero-card-sticker-right { bottom:20px; left:70%; } .about-transition-layer { grid-template-columns:1fr; gap:54px; padding-bottom:230px; } .about-copy-column { padding-top:72px; } .about-lead { width:calc(100vw - 40px); } .life-card-strip { --card-width:clamp(72px,20vw,105px); } .project-layout { grid-template-columns:1fr 1fr; } .project-copy { grid-column:1 / -1; grid-row:1; transform:none; justify-self:center; margin-bottom:35px; } .project-left-stack { grid-column:1; } .project-right-stack { grid-column:2; } .featured-art { width:88%; } }
 
-@media (max-width:560px) { .hero-section { height:100svh; } .hero-nav { width:100%; } .hero-nav-brand { left:14px; font-size:11px; } .hero-nav-items { margin-left:42px; } .hero-bio { top:27%; left:0; right:auto; width:100%; max-width:420px; } .hero-signature { top:48%; } .hero-wordmark { font-size:clamp(72px,24vw,118px); } .hero-asterisk { font-size:clamp(56px,19vw,92px); } .hero-signature sup { font-size:clamp(30px,10vw,50px); } .hero-hover-art { width:clamp(108px,27vw,124px); } .hero-card-deck { top:62%; width:122%; scale:.74; } .hero-upload-card { flex-basis:clamp(123px,36vw,162px); border-radius:10px; } .hero-upload-card+.hero-upload-card { margin-left:clamp(-48px,-10vw,-30px); } .hero-card-sticker-left { left:-18px; } .hero-card-sticker-right { bottom:16px; left:64%; } .about-transition-layer { padding-top:88px; } .about-copy-column { padding-top:48px; } .about-copy-column h2 { margin-bottom:28px; } .about-lead { margin-bottom:38px; font-size:24px; line-height:2; } .portrait-art { width:86%; } .project-section { padding-top:82px; } .project-layout { gap:20px; } .project-left-stack,.project-right-stack { gap:20px; } .project-copy { justify-self:start; } .featured-art { width:100%; border-radius:12px; } }
+@media (max-width:560px) { .hero-section { height:100svh; } .hero-nav { width:100%; } .hero-nav-brand { left:14px; font-size:11px; } .hero-nav-items { margin-left:42px; } .hero-bio { top:27%; left:0; right:auto; width:100%; max-width:420px; } .hero-signature { top:48%; } .hero-wordmark { font-size:clamp(72px,24vw,118px); } .hero-asterisk { font-size:clamp(56px,19vw,92px); } .hero-signature sup { font-size:clamp(30px,10vw,50px); } .hero-hover-art { width:clamp(108px,27vw,124px); } .hero-card-deck { top:62%; width:122%; scale:.74; } .hero-upload-card { flex-basis:clamp(123px,36vw,162px); border-radius:10px; } .hero-upload-card+.hero-upload-card { margin-left:clamp(-48px,-10vw,-30px); } .hero-card-sticker-left { left:-18px; } .hero-card-sticker-right { bottom:16px; left:64%; } .about-transition-layer { padding-top:88px; } .about-copy-column { padding-top:48px; } .about-copy-column h2 { margin-bottom:28px; } .about-lead { margin-bottom:38px; font-size:24px; line-height:2; } .project-section { padding-top:82px; } .project-layout { gap:20px; } .project-left-stack,.project-right-stack { gap:20px; } .project-copy { justify-self:start; } .featured-art { width:100%; border-radius:12px; } }
 
 @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .hero-section { position:relative; } .hero-background-stage,.hero-signature-line,.hero-card-deck,.hero-nav,.hero-bio,.hero-idea,.hero-stage,.about-transition-layer,.statement-background { opacity:1; transform:none; } .hero-scroll-content,.hero-signature-mask { transform:none!important; opacity:1!important; } }

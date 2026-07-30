@@ -1,11 +1,11 @@
 /**
- * [INPUT]: 依赖 React 的 useEffect/useRef/useState，依赖 HeroMotion 的统一首屏时间线、LiquidHover 的 WebGL 背景扰动，依赖 BounceCards、ScrollReveal 的逐词滚动高亮与 TextType 的 GSAP 动效，以及风筝草地 Hero、五套字形悬停素材、四张固定 Hero 卡片图和生活图片素材
- * [OUTPUT]: 对外提供 App 单页作品集组件、左侧带 KYao 品牌且导航选项独立居中的全宽首屏 Tab、封装背景与前景内容的独立 Hero 舞台、K/Y/a/T/M 带语义文字的独立图形反馈、四张固定图片倾斜 Hero 卡片，并组织首屏、介绍、项目拼贴与精选作品区
+ * [INPUT]: 依赖 React 的 useEffect/useRef/useState，依赖 HeroMotion 的统一首屏时间线、LiquidHover 的 WebGL 背景扰动，依赖 CapabilityReveal 的邮票撕离叙事、ScrollReveal 的逐词滚动高亮与 TextType 的 GSAP 动效，以及风筝草地 Hero、五套字形悬停素材、四张固定 Hero 卡片图和生活图片素材
+ * [OUTPUT]: 对外提供 App 单页作品集组件、左侧带 KYao 品牌且导航选项独立居中的全宽首屏 Tab、封装背景与前景内容的独立 Hero 舞台、K/Y/a/T/M 带语义文字的独立图形反馈、四张固定图片倾斜 Hero 卡片，并组织第二屏文字主张、逐张撕离邮票后揭示的渠道/能力/工作方式、项目拼贴与精选作品区
  * [POS]: src 的核心画布编排器，以“四段式作品集”状态流组织品牌入口、个人介绍、不对称项目网格与尾部精选作品；首屏运动职责委托给 HeroMotion
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 import { useEffect, useRef, useState } from 'react';
-import BounceCards from './BounceCards.jsx';
+import CapabilityReveal from './CapabilityReveal.jsx';
 import HeroMotion from './HeroMotion.jsx';
 import LiquidHover from './LiquidHover.jsx';
 import ScrollReveal from './ScrollReveal.jsx';
@@ -325,18 +325,11 @@ function AboutStatement() {
             {editables.introCopy}
           </ScrollReveal>
         </div>
-        <PortfolioMedia name="Portrait Artwork" className="portrait-art" src={lifeCardDefault03} alt="紫色调人物与雕塑艺术作品" />
-        <BounceCards
-          className="life-card-strip"
-          entranceMotion={false}
-          transformStyles={LIFE_CARD_TRANSFORMS}
-          hoverPush={56}
-          enableHover
-        >
+        <CapabilityReveal transformStyles={LIFE_CARD_TRANSFORMS}>
           {LIFE_CARD_MEDIA.map((media, index) => (
             <LifePhotoCard key={index} index={index + 1} {...media} />
           ))}
-        </BounceCards>
+        </CapabilityReveal>
       </div>
     </section>
   );
