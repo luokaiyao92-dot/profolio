@@ -1,6 +1,6 @@
 /**
- * [INPUT]: 依赖 React 的 Children/cloneElement/useLayoutEffect/useRef，依赖 GSAP 的弹性补间能力，接收现有 LifePhotoCard 子组件与基础 transform 列表
- * [OUTPUT]: 对外提供 BounceCards 动效容器，在进入视口时执行错峰弹入，并在悬停时推开相邻卡片、扶正当前卡片
+ * [INPUT]: 依赖 React 的 Children/cloneElement/useLayoutEffect/useRef，依赖 GSAP 的弹性补间能力，接收现有 LifePhotoCard 子组件、基础 transform 列表与可选入场开关
+ * [OUTPUT]: 对外提供 BounceCards 动效容器，可按场景关闭独立弹性入场，并在悬停时推开相邻卡片、扶正当前卡片
  * [POS]: src 的卡片动效适配层，不创建图片内容，只增强 App.jsx 已拆分的卡片结构并保持透明齿孔与照片图层契约
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -24,6 +24,7 @@ export default function BounceCards({
   animationDelay = 0.12,
   animationStagger = 0.09,
   easeType = 'elastic.out(1, 0.55)',
+  entranceMotion = true,
   transformStyles = [],
   hoverPush = 56,
   enableHover = true,
@@ -39,7 +40,7 @@ export default function BounceCards({
     const context = gsap.context(() => {
       const targets = gsap.utils.toArray('.bounce-card-item', container);
 
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      if (!entranceMotion || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         gsap.set(targets, { scale: 1 });
         return;
       }
@@ -65,7 +66,7 @@ export default function BounceCards({
       observer?.disconnect();
       context.revert();
     };
-  }, [animationDelay, animationStagger, cards.length, easeType]);
+  }, [animationDelay, animationStagger, cards.length, easeType, entranceMotion]);
 
   const animateHover = (hoveredIndex) => {
     if (!enableHover || !containerRef.current) return;

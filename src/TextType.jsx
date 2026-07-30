@@ -1,5 +1,5 @@
 /**
- * [INPUT]: 依赖 React 的状态、计时器与 IntersectionObserver，依赖 GSAP 提供光标呼吸，接收标题文本、输入节奏与可编辑键
+ * [INPUT]: 依赖 React 的状态、计时器与 IntersectionObserver，依赖 GSAP 提供光标呼吸，接收标题文本、输入节奏、观察边界、可选一次性激活事件与可编辑键
  * [OUTPUT]: 对外提供 TextType 可见时启动的变速打字组件，支持单次或循环文本、减少动态偏好与本地可编辑持久化
  * [POS]: src 的标题动效适配层，将 React Bits 打字行为限制在文本内容层，避免编辑操作与光标装饰互相污染
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
@@ -38,6 +38,9 @@ export default function TextType({
   variableSpeed,
   onSentenceComplete,
   startOnVisible = false,
+  visibilityThreshold = 0.35,
+  visibilityRootMargin = '0px',
+  activationEvent,
   reverseMode = false,
   editableName,
   ...props
@@ -63,16 +66,21 @@ export default function TextType({
   }, [typingSpeed, variableSpeed]);
 
   useEffect(() => {
+    if (activationEvent && !reducedMotion) {
+      const activate = () => setIsVisible(true);
+      window.addEventListener(activationEvent, activate, { once: true });
+      return () => window.removeEventListener(activationEvent, activate);
+    }
     if (!startOnVisible || !containerRef.current || reducedMotion) return undefined;
 
     const observer = new IntersectionObserver(([entry]) => {
       if (!entry.isIntersecting) return;
       setIsVisible(true);
       observer.disconnect();
-    }, { threshold: 0.35 });
+    }, { threshold: visibilityThreshold, rootMargin: visibilityRootMargin });
     observer.observe(containerRef.current);
     return () => observer.disconnect();
-  }, [reducedMotion, startOnVisible]);
+  }, [activationEvent, reducedMotion, startOnVisible, visibilityRootMargin, visibilityThreshold]);
 
   useEffect(() => {
     if (!showCursor || !cursorRef.current) return undefined;

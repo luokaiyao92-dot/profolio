@@ -1,7 +1,7 @@
 /**
- * [INPUT]: 依赖 React 的 useLayoutEffect/useMemo/useRef/useState，依赖 GSAP ScrollTrigger，将纯文本、滚动容器与揭示参数作为输入
- * [OUTPUT]: 对外提供 ScrollReveal 可编辑逐字滚动揭示组件，在视口滚动中完成旋转、透明度与模糊过渡
- * [POS]: src 的正文动效适配层，为中文内容提供逐字分段并将动画生命周期限制在自身节点，不干扰 BounceCards 等兄弟动效
+ * [INPUT]: 依赖 React 的 useLayoutEffect/useMemo/useRef/useState，依赖 GSAP ScrollTrigger，将正文、明暗颜色、分词策略与滚动起止位置作为输入
+ * [OUTPUT]: 对外提供 ScrollReveal 可编辑滚动高亮组件，使正文词组随滚动从低对比度逐步点亮为纯白
+ * [POS]: src 的正文动效适配层，以中文感知分词和单一 ScrollTrigger 承接 Originkit Scroll Text Highlight，不改变第二屏业务布局
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -22,80 +22,64 @@ function readEditableText(storageKey, fallbackText) {
   return textLayer.textContent || fallbackText;
 }
 
+function splitText(text, splitBy) {
+  if (splitBy === 'characters') return Array.from(text);
+
+  if (typeof Intl?.Segmenter === 'function') {
+    const segmenter = new Intl.Segmenter('zh-CN', { granularity: 'word' });
+    return Array.from(segmenter.segment(text), ({ segment }) => segment);
+  }
+
+  return text.split(/(\s+)/).filter(Boolean);
+}
+
 export default function ScrollReveal({
   children,
   editableName,
-  scrollContainerRef,
-  enableBlur = true,
-  baseOpacity = 0.1,
-  baseRotation = 3,
-  blurStrength = 4,
   containerClassName = '',
   textClassName = '',
-  rotationEnd = 'bottom 58%',
-  wordAnimationEnd = 'bottom 52%',
+  dimColor = 'rgba(255, 255, 255, 0.15)',
+  highlightColor = '#FFFFFF',
+  splitBy = 'words',
+  scrollStart = 'top center',
+  scrollEnd = 'bottom center',
+  scrub = true,
 }) {
-  const containerRef = useRef(null);
+  const paragraphRef = useRef(null);
   const initialText = typeof children === 'string' ? children : '';
   const storageKey = editableName ? `ky-portfolio-${editableName}` : '';
   const [text, setText] = useState(() => readEditableText(storageKey, initialText));
-
-  const splitText = useMemo(() => Array.from(text).map((character, index) => (
-    <span className="scroll-reveal-character" key={`${index}-${character}`}>
-      {character}
-    </span>
-  )), [text]);
+  const segments = useMemo(() => splitText(text, splitBy), [splitBy, text]);
 
   useLayoutEffect(() => {
-    const container = containerRef.current;
-    if (!container) return undefined;
+    const paragraph = paragraphRef.current;
+    if (!paragraph) return undefined;
 
-    const characters = container.querySelectorAll('.scroll-reveal-character');
-    const scroller = scrollContainerRef?.current;
-    const scrollSource = scroller ? { scroller } : {};
+    const targets = paragraph.querySelectorAll('.scroll-highlight-token');
     const context = gsap.context(() => {
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        gsap.set(container, { rotate: 0 });
-        gsap.set(characters, { opacity: 1, filter: 'blur(0px)' });
+        gsap.set(targets, { color: highlightColor });
         return;
       }
 
-      gsap.fromTo(container, {
-        rotate: baseRotation,
-        transformOrigin: '0% 50%',
+      gsap.fromTo(targets, {
+        color: dimColor,
       }, {
-        rotate: 0,
+        color: highlightColor,
+        stagger: splitBy === 'characters' ? 0.03 : 0.1,
         ease: 'none',
         scrollTrigger: {
-          trigger: container,
-          start: 'top 88%',
-          end: rotationEnd,
-          scrub: true,
-          ...scrollSource,
+          trigger: paragraph,
+          start: scrollStart,
+          end: scrollEnd,
+          scrub,
         },
       });
-
-      gsap.fromTo(characters, {
-        opacity: baseOpacity,
-        filter: enableBlur ? `blur(${blurStrength}px)` : 'blur(0px)',
-      }, {
-        opacity: 1,
-        filter: 'blur(0px)',
-        stagger: 0.04,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: container,
-          start: 'top 82%',
-          end: wordAnimationEnd,
-          scrub: true,
-          ...scrollSource,
-        },
-      });
-    }, container);
+    }, paragraph);
 
     ScrollTrigger.refresh();
     return () => context.revert();
-  }, [baseOpacity, baseRotation, blurStrength, enableBlur, rotationEnd, scrollContainerRef, text, wordAnimationEnd]);
+  }, [dimColor, highlightColor, scrollEnd, scrollStart, scrub, splitBy, text]);
 
   const saveText = (event) => {
     const nextText = event.currentTarget.innerText;
@@ -104,21 +88,21 @@ export default function ScrollReveal({
   };
 
   return (
-    <div
-      ref={containerRef}
-      className={`scroll-reveal ${containerClassName}`.trim()}
-      data-layer="Motion / About Copy Scroll Reveal"
+    <p
+      ref={paragraphRef}
+      className={`scroll-reveal-text ${containerClassName} ${textClassName}`.trim()}
+      data-layer="Motion / About Copy Scroll Highlight"
+      contentEditable={Boolean(editableName)}
+      suppressContentEditableWarning
+      spellCheck={false}
+      onBlur={saveText}
+      style={{ '--scroll-dim-color': dimColor }}
     >
-      <p
-        className={`scroll-reveal-text ${textClassName}`.trim()}
-        data-layer={`Text / ${editableName || 'scroll-reveal'}`}
-        contentEditable={Boolean(editableName)}
-        suppressContentEditableWarning
-        spellCheck={false}
-        onBlur={saveText}
-      >
-        {splitText}
-      </p>
-    </div>
+      {segments.map((segment, index) => (/^\s+$/.test(segment) ? segment : (
+        <span className="scroll-highlight-token" key={`${index}-${segment}`}>
+          {segment}
+        </span>
+      )))}
+    </p>
   );
 }

@@ -1,16 +1,15 @@
 /**
- * [INPUT]: 依赖 React 的 useEffect/useRef/useState，依赖 HeroIntro 的封面状态边界、LiquidHover 的 WebGL 背景扰动，依赖 BounceCards、ScrollReveal 与 TextType 的 GSAP 动效，以及风筝草地 Hero、五套字形悬停素材、四张固定 Hero 卡片图和生活图片素材
- * [OUTPUT]: 对外提供 App 单页作品集组件、Fluid Reveal 入口、可随指针流动的风筝草地 Hero、K/Y/a/T/M 带语义文字的独立图形反馈、四张无需上传操作且刷新后稳定保留图片的倾斜 Hero 卡片以及无悬停反馈的 * 字形，并组织介绍、项目拼贴与精选作品区
- * [POS]: src 的核心画布编排器，以“封面解锁→四段式作品集”状态流组织品牌入口、个人介绍、不对称项目网格与尾部精选作品
+ * [INPUT]: 依赖 React 的 useEffect/useRef/useState，依赖 HeroMotion 的统一首屏时间线、LiquidHover 的 WebGL 背景扰动，依赖 BounceCards、ScrollReveal 的逐词滚动高亮与 TextType 的 GSAP 动效，以及风筝草地 Hero、五套字形悬停素材、四张固定 Hero 卡片图和生活图片素材
+ * [OUTPUT]: 对外提供 App 单页作品集组件、左侧带 KYao 品牌且导航选项独立居中的全宽首屏 Tab、封装背景与前景内容的独立 Hero 舞台、K/Y/a/T/M 带语义文字的独立图形反馈、四张固定图片倾斜 Hero 卡片，并组织首屏、介绍、项目拼贴与精选作品区
+ * [POS]: src 的核心画布编排器，以“四段式作品集”状态流组织品牌入口、个人介绍、不对称项目网格与尾部精选作品；首屏运动职责委托给 HeroMotion
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 import { useEffect, useRef, useState } from 'react';
 import BounceCards from './BounceCards.jsx';
-import HeroIntro from './HeroIntro.jsx';
+import HeroMotion from './HeroMotion.jsx';
 import LiquidHover from './LiquidHover.jsx';
 import ScrollReveal from './ScrollReveal.jsx';
 import TextType from './TextType.jsx';
-import './HeroIntro.css';
 import heroCreateFlower from '../assets/hero-create-flower.png';
 import heroHoverArrow from '../assets/hero-hover-arrow.png';
 import heroHoverGreen from '../assets/hero-hover-green.png';
@@ -60,8 +59,6 @@ const HERO_CARD_MEDIA = [
 ];
 
 const editables = {
-  brand: <>Design&amp;<br />Creation</>,
-  motto: '让工具成为',
   bio: '我是罗凯尧,有设计经验 8 年, 擅长 Sass 产品以及擅长打破固有框架重新搭建适合产品的设计框架,在生活中,我也一直不定期的进行设计类的 side project,维持设计思维的活跃度,与松弛感.',
   idea: <>我带来<br />工具心的使用方式以及思考.</>,
   introTitle: 'I’m Kaiyao',
@@ -167,7 +164,9 @@ function HeroSignature() {
 
   return (
     <div ref={signatureRef} className="hero-signature" data-layer="Text Group / Hero Signature">
-      <h1 className="hero-wordmark hero-anim hero-reveal" data-layer="Text Group / KYa Wordmark">
+      <div className="hero-signature-mask">
+        <div className="hero-signature-line">
+      <h1 className="hero-wordmark" data-layer="Text Group / KYa Wordmark">
         <EditableText
           name="hero-glyph-k"
           as="span"
@@ -190,8 +189,8 @@ function HeroSignature() {
           onMouseLeave={() => hideArt('a')}
         >a</EditableText>
       </h1>
-      <EditableText name="hero-asterisk" as="span" className="hero-asterisk hero-anim hero-reveal">*</EditableText>
-      <sup className="hero-trademark hero-anim hero-reveal" data-layer="Text Group / Trademark">
+      <EditableText name="hero-asterisk" as="span" className="hero-asterisk">*</EditableText>
+      <sup className="hero-trademark" data-layer="Text Group / Trademark">
         <EditableText
           name="hero-glyph-t"
           as="span"
@@ -207,6 +206,8 @@ function HeroSignature() {
           onMouseLeave={() => hideArt('m')}
         >M</EditableText>
       </sup>
+        </div>
+      </div>
 
       <div
         className={`hero-hover-art ${hoverItem ? 'is-asset' : ''} ${hoverArt ? 'is-visible' : ''}`}
@@ -226,7 +227,12 @@ function HeroCardDeck() {
   return (
     <div className="hero-card-deck" data-layer="Card Group / Hero Artwork Deck">
       {HERO_CARD_MEDIA.map((card, index) => (
-        <article className={`hero-upload-card hero-upload-card-${index + 1}`} key={index}>
+        <article
+          className={`hero-upload-card hero-upload-card-${index + 1}`}
+          key={index}
+          tabIndex={0}
+          aria-label={`查看作品卡片 ${index + 1}`}
+        >
           {index === 0 && <span className="hero-card-sticker hero-card-sticker-left">UX Designer</span>}
           {index === 3 && <span className="hero-card-sticker hero-card-sticker-right">Don't let people think</span>}
           <div className="hero-upload-preview has-image">
@@ -238,52 +244,56 @@ function HeroCardDeck() {
   );
 }
 
-function InteractiveHero({ liquidEnabled }) {
+function HeroNavigation() {
   return (
-    <section className="hero-section" data-layer="Section / Interactive Hero">
-      <div
-        className="hero-background"
-        role="img"
-        aria-label="蓝天白云、花田、蝴蝶与彩色风筝"
-        data-layer="Media / Liquid Hero Background"
-      >
-        <img className="hero-background-fallback" src={heroSkyKite} alt="" />
-        {liquidEnabled && (
-          <LiquidHover imageSrc={heroSkyKite} resolution={10} cursorSize={50} intensity={50} />
-        )}
+    <header className="hero-header page-shell" data-layer="Navigation / Primary">
+      <div className="hero-nav">
+        <a className="hero-nav-brand" href="#top" aria-label="返回首页">KYao</a>
+        <nav className="hero-nav-items" aria-label="主要导航">
+          <NavItem name="Work" href="#work">WORK</NavItem>
+          <NavItem name="Contact" href="#contact">CONTACT</NavItem>
+          <NavItem name="Resume" href="#about">RESUME</NavItem>
+          <NavItem name="Music" href="#about">音乐关闭</NavItem>
+          <NavItem name="Language" href="#about">EN</NavItem>
+        </nav>
       </div>
-      <div className="hero-content page-shell">
-        <header className="hero-header" data-layer="Navigation / Primary">
-          <EditableText name="hero-brand" as="h2" className="hero-brand">{editables.brand}</EditableText>
-          <EditableText name="hero-motto" className="hero-motto">{editables.motto}</EditableText>
-          <div className="hero-nav">
-            <NavItem name="Work" href="#work">WORK</NavItem>
-            <NavItem name="Contact" href="#contact">CONTACT</NavItem>
-            <NavItem name="Resume" href="#about">RESUME</NavItem>
-            <NavItem name="Music" href="#about">音乐关闭</NavItem>
-            <NavItem name="Language" href="#about">EN</NavItem>
-          </div>
-        </header>
+    </header>
+  );
+}
 
-        <EditableText name="hero-bio" className="hero-bio hero-anim hero-fade">{editables.bio}</EditableText>
-        <HeroSignature />
-        <HeroCardDeck />
-        <EditableText name="hero-idea" className="hero-idea hero-anim hero-fade">{editables.idea}</EditableText>
+function InteractiveHero() {
+  return (
+    <section id="top" className="hero-section" data-layer="Section / Interactive Hero">
+      <div className="hero-stage" data-layer="Group / Hero Stage">
+        <div
+          className="hero-background"
+          role="img"
+          aria-label="蓝天白云、花田、蝴蝶与彩色风筝"
+          data-layer="Media / Liquid Hero Background"
+        >
+          <div className="hero-background-stage">
+            <img className="hero-background-fallback" src={heroSkyKite} alt="" />
+            <LiquidHover imageSrc={heroSkyKite} resolution={10} cursorSize={50} intensity={50} />
+          </div>
+        </div>
+        <div className="hero-content page-shell">
+          <div className="hero-scroll-content">
+            <EditableText name="hero-bio" className="hero-bio">{editables.bio}</EditableText>
+            <HeroSignature />
+            <HeroCardDeck />
+            <EditableText name="hero-idea" className="hero-idea">{editables.idea}</EditableText>
+          </div>
+        </div>
       </div>
     </section>
   );
 }
 
-function App() {
-  const [isIntroVisible, setIsIntroVisible] = useState(true);
-
+function AboutStatement() {
   return (
-    <>
-      {isIntroVisible && <HeroIntro onComplete={() => setIsIntroVisible(false)} />}
-      <main className="portfolio-canvas" data-layer="Page / Kaiyao Portfolio" aria-hidden={isIntroVisible || undefined}>
-      <InteractiveHero liquidEnabled={!isIntroVisible} />
-
-      <section id="about" className="about-section page-shell" data-layer="Section / About">
+    <section id="about" className="about-section page-shell" data-layer="Section / About">
+      <div className="statement-background" aria-hidden="true" />
+      <div className="about-transition-layer">
         <div className="about-copy-column" data-layer="Group / About Copy">
           <TextType
             text={editables.introTitle}
@@ -299,16 +309,18 @@ function App() {
             cursorClassName="about-title-cursor"
             variableSpeed={{ min: 54, max: 108 }}
             startOnVisible
+            activationEvent="portfolio:statement-ready"
           />
           <ScrollReveal
             editableName="about-copy"
             containerClassName="about-lead"
             textClassName="editable-text"
-            baseOpacity={0.12}
-            baseRotation={2}
-            blurStrength={8}
-            rotationEnd="bottom 58%"
-            wordAnimationEnd="bottom 52%"
+            dimColor="rgba(255, 255, 255, 0.15)"
+            highlightColor="#FFFFFF"
+            splitBy="words"
+            scrollStart="top center"
+            scrollEnd="bottom center"
+            scrub
           >
             {editables.introCopy}
           </ScrollReveal>
@@ -316,9 +328,7 @@ function App() {
         <PortfolioMedia name="Portrait Artwork" className="portrait-art" src={lifeCardDefault03} alt="紫色调人物与雕塑艺术作品" />
         <BounceCards
           className="life-card-strip"
-          animationDelay={0.12}
-          animationStagger={0.09}
-          easeType="elastic.out(1, 0.55)"
+          entranceMotion={false}
           transformStyles={LIFE_CARD_TRANSFORMS}
           hoverPush={56}
           enableHover
@@ -327,7 +337,19 @@ function App() {
             <LifePhotoCard key={index} index={index + 1} {...media} />
           ))}
         </BounceCards>
-      </section>
+      </div>
+    </section>
+  );
+}
+
+function App() {
+  return (
+    <main className="portfolio-canvas" data-layer="Page / Kaiyao Portfolio">
+      <HeroMotion>
+        <HeroNavigation />
+        <InteractiveHero />
+        <AboutStatement />
+      </HeroMotion>
 
       <section id="work" className="project-section page-shell" data-layer="Section / Project Layout">
         <EditableText name="project-section-note" className="section-note">{editables.idea}</EditableText>
@@ -351,8 +373,7 @@ function App() {
         <EditableText name="featured-note" className="section-note">{editables.idea}</EditableText>
         <PortfolioMedia name="Featured Artwork" className="featured-art" src={lifeCardDefault03} alt="紫色调精选人物艺术作品" />
       </section>
-      </main>
-    </>
+    </main>
   );
 }
 

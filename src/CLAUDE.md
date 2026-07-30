@@ -1,19 +1,20 @@
 # src/
 > L2 | 父级: ../CLAUDE.md
 
-App.jsx: 可编辑作品集画布，管理 HeroIntro 封面状态，封面交接完成后才挂载 LiquidHover 并以真实风筝草地图片作为 100dvh Hero 背景，同时承载 K→Creative 花形、Y→Thinking 银色箭头、a→Taste 橙色软体、T/M→A bit of fun 绿色多孔体的独立悬停映射，以及四张刷新后仍保留项目素材的固定图片倾斜卡片；* 仅作为静态可编辑字形。
+App.jsx: 可编辑作品集画布，以 HeroMotion 将独立固定导航、封装背景与全部前景内容的 100dvh Hero 舞台和 AboutStatement 品牌主张区组合为连续转场场景；Hero 舞台继续承载 LiquidHover、K/Y/a/T/M 独立悬停映射与四张倾斜卡片，第二屏业务内容保持独立函数边界。
+HeroMotion.jsx: Hero 到品牌主张区的运动编排边界，在字体就绪或 900ms 安全上限后建立首屏入场，并以唯一 ScrollTrigger 的 1 个完整视口进度将 Hero 舞台按顶部中心锚点从 100% 缩至 70%、固定导航等高收至屏宽 60%，让两者终点与品牌主张区完全覆盖 Hero 的时刻同步；减少动态模式保留正常文档流与完整导航宽度。
 ClickSpark.jsx: React Bits 全站点击反馈层，以 DPR 适配的固定 Canvas 绘制白色八向火花，仅在活跃火花存在时请求动画帧，并尊重减少动态效果偏好。
-HeroIntro.jsx: 首屏状态边界，以点阵双手图作为全屏按钮，在页面加载时并行预取独立 BlobReveal 代码块与风筝草地纹理，点击后立即执行 2 秒 GPU 液态揭示并交接给同图背景的真实 Hero。
+HeroIntro.jsx: 保留的可选开场组件，以点阵双手图作为全屏按钮并通过 BlobReveal 执行 GPU 液态揭示；当前默认首屏为安静直达内容，不挂载该阻塞式封面。
 HeroIntro.css: HeroIntro 层级样式，限定全屏封面、WebGL Canvas 覆盖层和揭示期间的输入锁定，不重复实现 Shader 图形。
 BlobReveal.jsx: Originkit WebGL 过渡渲染器，以 Three.js ShaderMaterial、20 个柔和混合 SDF Blob 和 GSAP uProgress 补间从中心扩张图二纹理，并在卸载时释放 GPU 资源。
 LiquidHover.jsx: Originkit WebGL 背景渲染器，以低分辨率流体速度场、散度与压力迭代驱动风筝草地纹理随鼠标划过产生液态扭曲，保持 Hero 前景 UI 独立稳定并由静态图片兜底。
-BounceCards.jsx: React Bits 动效适配层，以 IntersectionObserver 触发 GSAP 弹性错峰入场，并在悬停时推开兄弟卡片、扶正当前卡片，不接管卡片内容结构。
+BounceCards.jsx: React Bits 动效适配层，支持按场景关闭 IntersectionObserver 弹性入场，并在悬停时推开兄弟卡片、扶正当前卡片；品牌主张转场关闭独立入场以避免动画竞争。
 BounceCards.css: BounceCards 行为样式，限定定位、指针、合成层与减少动态偏好，不覆盖邮票视觉系统。
 main.jsx: React 应用启动边界，以 ClickSpark 包裹 App 后挂载到 Vite 根节点并加载全局视觉系统。
-ScrollReveal.jsx: React Bits 中文适配层，以 GSAP ScrollTrigger 驱动第二屏正文逐字旋转、透明度与模糊揭示，并保留 contentEditable 与本地持久化。
-ScrollReveal.css: ScrollReveal 行为样式，提供逐字合成层、排版继承和减少动态偏好降级，不重复定义正文视觉参数。
-TextType.jsx: React Bits 标题适配层，以 IntersectionObserver 启动单次变速打字并用 GSAP 驱动光标，编辑时切换到完整文本且沿用本地持久化。
+ScrollReveal.jsx: Originkit Scroll Text Highlight 中文适配层，以 Intl.Segmenter 感知中文词组，并用单一 GSAP ScrollTrigger 在 `top center` 到 `bottom center` 区间将第二屏正文从 15% 白色逐词点亮为纯白；保留 contentEditable、本地持久化与减少动态降级。
+ScrollReveal.css: ScrollReveal 行为样式，提供逐词颜色合成层、排版继承和减少动态偏好纯白最终态，不重复定义正文视觉参数。
+TextType.jsx: React Bits 标题适配层，可通过 IntersectionObserver 或一次性语义事件启动变速打字并用 GSAP 驱动光标；品牌主张标题只消费 HeroMotion 在进度 0.6 发出的激活事件，编辑时切换到完整文本且沿用本地持久化。
 TextType.css: TextType 行为样式，提供稳定标题占位、编辑反馈和绿色呼吸光标，不重复定义 Konstant Grotesk 排版。
-styles.css: 全站设计令牌、1700px 版心、保持原图亮度且无黑色遮罩的 sticky 流体 Hero、统一 15% 黑色阴影的品牌名/标语/个人介绍、定位于导航下方与风筝右侧留白区的个人介绍、后续章节覆盖层级、静态兜底、K/Y/a/T/M 最大 162px 且锚定各字母几何中心的带字透明图形、四张最大 231px 且按 -12°/-1°/1°/12° 扇形依次上叠的白描边固定图片卡片、只上升不扶正的悬停层级反馈、分别锚定首卡上沿与末卡右下外沿的黄色描边文字贴纸、静态 * 与字标入场，以及真实媒体裁切、不对称项目网格和移动端重排规则。
+styles.css: 全站设计令牌、1700px 版心、品牌和选项互不干扰且可在转场中等高收至屏宽 60% 的固定胶囊导航、独立黑色页面底板、带响应式外间距与圆角裁切的 sticky 流体 Hero 舞台、保证顶部锚定持续到完全覆盖且正文以 24px/2 倍行距阿里巴巴普惠体横贯页面安全宽度的整屏品牌主张层、K/Y/a/T/M 透明悬停图形、悬停时上升 24px/扶正/提升层级的四张白描边固定图片卡片、真实媒体裁切、不对称项目网格，以及移动端与减少动态降级。
 
 [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md

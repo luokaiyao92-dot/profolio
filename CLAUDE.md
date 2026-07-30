@@ -2,8 +2,8 @@
 React 19.2.6 + Vite 8.0.13 + Three.js 0.185.1 + GSAP 3.15.0 + 原生 CSS
 
 <directory>
-src/ - 单页作品集应用与视觉系统，包含融化封面、流体响应背景、字标与固定图片倾斜卡片 Hero、个人介绍、不对称项目网格与精选作品模块（HeroIntro.jsx、LiquidHover.jsx、App.jsx、main.jsx、styles.css）
-assets/ - 可替换网站媒体素材；包含点阵双手首屏、字标透明悬停图形、四张 Hero 固定卡片原图、邮票蒙版，以及由介绍和项目区共同消费的生活图片
+src/ - 单页作品集应用与视觉系统，包含统一 Hero 入场、以整屏滚动同步顶部锚定缩放、导航等高收窄至屏宽 60% 与品牌主张覆盖的共享进度、横贯页面安全宽度的第二屏中文逐词滚动高亮、可选融化封面、流体响应背景、字标与固定图片倾斜卡片、个人介绍、不对称项目网格与精选作品模块（HeroMotion.jsx、ScrollReveal.jsx、HeroIntro.jsx、LiquidHover.jsx、App.jsx、main.jsx、styles.css）
+assets/ - 可替换网站媒体与字体素材；包含阿里巴巴普惠体 Regular、点阵双手首屏、字标透明悬停图形、四张 Hero 固定卡片原图、邮票蒙版，以及由介绍和项目区共同消费的生活图片
 </directory>
 
 <config>
