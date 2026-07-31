@@ -24,6 +24,10 @@ import lifeCardDefault02 from '../assets/life-card-default-02.jpg';
 import lifeCardDefault03 from '../assets/life-card-default-03.jpg';
 import lifeCardDefault04 from '../assets/life-card-default-04.jpg';
 import lifeCardDefault05 from '../assets/life-card-default-05.jpg';
+import lifeCardHover01 from '../assets/已生成图像 1 (4).png';
+import lifeCardHover02 from '../assets/已生成图像 2.png';
+import lifeCardHover03 from '../assets/已生成图像 3.png';
+import featuredArtwork from '../assets/featured-artwork.png';
 
 const LIFE_CARD_TRANSFORMS = [
   'translateY(-3px) rotate(-0.4deg)',
@@ -35,9 +39,9 @@ const LIFE_CARD_TRANSFORMS = [
 ];
 
 const LIFE_CARD_MEDIA = [
-  { defaultImage: lifeCardDefault01, hoverImage: null, alt: '蓝色天空中的飞机与建筑剪影' },
-  { defaultImage: lifeCardDefault02, hoverImage: null, alt: '橙红色山丘与天空' },
-  { defaultImage: lifeCardDefault03, hoverImage: null, alt: '紫色调生活记录与雕塑' },
+  { defaultImage: lifeCardDefault01, hoverImage: lifeCardHover01, alt: '蓝色天空中的飞机与建筑剪影' },
+  { defaultImage: lifeCardDefault02, hoverImage: lifeCardHover02, alt: '橙红色山丘与天空' },
+  { defaultImage: lifeCardDefault03, hoverImage: lifeCardHover03, alt: '紫色调生活记录与雕塑' },
   { defaultImage: lifeCardDefault04, hoverImage: null, alt: '绿色调城市建筑' },
   { defaultImage: lifeCardDefault05, hoverImage: null, alt: '暖橙色天空中的飞机与建筑剪影' },
   { defaultImage: lifeCardDefault01, hoverImage: null, alt: '蓝色天空中的飞机与建筑剪影' },
@@ -363,8 +367,8 @@ function App() {
       </section>
 
       <section id="contact" className="featured-section page-shell" data-layer="Section / Featured Artwork">
-        <EditableText name="featured-note" className="section-note">{editables.idea}</EditableText>
-        <PortfolioMedia name="Featured Artwork" className="featured-art" src={lifeCardDefault03} alt="紫色调精选人物艺术作品" />
+        <h2 className="featured-title" data-layer="Text / Featured Title">人生的每个节点</h2>
+        <PortfolioMedia name="Featured Artwork" className="featured-art" src={featuredArtwork} alt="蓝天下草地上的蓝色面包车插画" />
       </section>
     </main>
   );

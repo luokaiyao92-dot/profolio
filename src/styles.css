@@ -106,6 +106,7 @@ button,a { font:inherit; }
 .project-description { max-width:410px; margin:0; font-size:clamp(14px,1.1vw,21px); line-height:1.23; letter-spacing:-.045em; }
 
 .featured-section { position:relative; z-index:4; min-height:clamp(540px,53vw,960px); padding:clamp(46px,6vw,110px) 0 clamp(82px,9vw,164px); background:#000; }
+.featured-title { margin:0 0 clamp(40px,5vw,80px); text-align:center; font-size:clamp(36px,5.5vw,92px); font-weight:400; line-height:1.05; letter-spacing:-.045em; color:#fff; }
 .featured-art { width:min(67%,980px); margin:0 auto; aspect-ratio:1.48/1; border-radius:20px; }
 .featured-art img { object-position:center 38%; }
 
