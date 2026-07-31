@@ -6,7 +6,7 @@
  */
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Noto+Sans+SC:wght@400;500&display=swap');
 
-@font-face { font-family:'Alibaba PuHuiTi'; src:url('../assets/AlibabaPuHuiTi-3-55-Regular.ttf') format('truetype'); font-style:normal; font-weight:400; font-display:swap; }
+@font-face { font-family:'Alibaba PuHuiTi'; src:url('../assets/AlibabaPuHuiTi-3-55-Regular.woff2') format('woff2'); font-style:normal; font-weight:400; font-display:swap; }
 
 :root { --paper:#f7f7f5; --black:#000; --muted:#a6a6a6; --line:rgba(255,255,255,.15); --page:min(1700px, calc(100% - 104px)); font-family:'DM Sans','Noto Sans SC',sans-serif; background:var(--black); color:var(--paper); }
 * { box-sizing:border-box; }
