@@ -132,14 +132,7 @@ export default function HeroMotion({ children }) {
             const smoothProgress = easeInOutCubic(progress);
             const statementEnter = easeInOutCubic(range(progress, 0.25, mobile ? 0.68 : 0.75));
             const backgroundEnter = easeInOutCubic(range(progress, mobile ? 0.32 : 0.38, mobile ? 0.72 : 0.86));
-            const fullNavigationWidth = Math.min(
-              1700,
-              window.innerWidth - (window.innerWidth <= 900 ? 40 : 104),
-            );
-            const compactNavigationWidth = window.innerWidth * 0.6;
-
             heroStage.style.transform = `scale(${mix(1, 0.7, smoothProgress)})`;
-            heroHeader.style.width = `${mix(fullNavigationWidth, compactNavigationWidth, smoothProgress)}px`;
             setStatementY(mix(statementDistance, 0, statementEnter));
             setStatementOpacity(statementEnter);
             setBackgroundOpacity(backgroundEnter);
@@ -161,10 +154,8 @@ export default function HeroMotion({ children }) {
       context?.revert();
       scopeRef.current?.style.removeProperty('--transition-progress');
       const heroStage = scopeRef.current?.querySelector('.hero-stage');
-      const heroHeader = scopeRef.current?.querySelector('.hero-header');
       heroStage?.style.removeProperty('pointer-events');
       heroStage?.style.removeProperty('transform');
-      heroHeader?.style.removeProperty('width');
     };
   }, []);
 

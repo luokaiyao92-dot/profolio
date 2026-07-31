@@ -6,6 +6,7 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import CapabilityReveal from './CapabilityReveal.jsx';
+import FeaturedArtwork from './FeaturedArtwork.jsx';
 import HeroMotion from './HeroMotion.jsx';
 import LiquidHover from './LiquidHover.jsx';
 import ScrollReveal from './ScrollReveal.jsx';
@@ -27,7 +28,6 @@ import lifeCardDefault05 from '../assets/life-card-default-05.jpg';
 import lifeCardHover01 from '../assets/已生成图像 1 (4).png';
 import lifeCardHover02 from '../assets/已生成图像 2.png';
 import lifeCardHover03 from '../assets/已生成图像 3.png';
-import featuredArtwork from '../assets/featured-artwork.png';
 
 const LIFE_CARD_TRANSFORMS = [
   'translateY(-3px) rotate(-0.4deg)',
@@ -366,10 +366,7 @@ function App() {
         </div>
       </section>
 
-      <section id="contact" className="featured-section page-shell" data-layer="Section / Featured Artwork">
-        <h2 className="featured-title" data-layer="Text / Featured Title">人生的每个节点</h2>
-        <PortfolioMedia name="Featured Artwork" className="featured-art" src={featuredArtwork} alt="蓝天下草地上的蓝色面包车插画" />
-      </section>
+      <FeaturedArtwork />
     </main>
   );
 }
